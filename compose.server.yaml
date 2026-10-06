@@ -1,0 +1,30 @@
+# Servidor (astro-vps): sin puertos publicados en el host. Traefik (Coolify)
+# llega al contenedor por la red Docker "coolify", igual que links-web.
+# Los middlewares son propios (prefijo entrenos-) para no depender de los de Coolify.
+services:
+  app:
+    networks:
+      - coolify
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=coolify
+      # HTTP → HTTPS (el desafío ACME tiene prioridad interna en Traefik)
+      - traefik.http.routers.entrenos-http.entryPoints=http
+      - traefik.http.routers.entrenos-http.rule=Host(`entrenos.wyll-servidor.duckdns.org`)
+      - traefik.http.routers.entrenos-http.middlewares=entrenos-a-https
+      - traefik.http.middlewares.entrenos-a-https.redirectscheme.scheme=https
+      - traefik.http.middlewares.entrenos-a-https.redirectscheme.permanent=true
+      # HTTPS
+      - traefik.http.routers.entrenos.entryPoints=https
+      - traefik.http.routers.entrenos.rule=Host(`entrenos.wyll-servidor.duckdns.org`)
+      - traefik.http.routers.entrenos.tls=true
+      - traefik.http.routers.entrenos.tls.certresolver=letsencrypt
+      - traefik.http.routers.entrenos.middlewares=entrenos-hsts,entrenos-limite
+      - traefik.http.middlewares.entrenos-hsts.headers.stsSeconds=31536000
+      # Las peticiones son texto pequeño: 1 MB de sobra.
+      - traefik.http.middlewares.entrenos-limite.buffering.maxRequestBodyBytes=1000000
+      - traefik.http.services.entrenos.loadbalancer.server.port=3000
+
+networks:
+  coolify:
+    external: true

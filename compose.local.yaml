@@ -1,0 +1,8 @@
+# Solo para probar el contenedor en el PC: expone 127.0.0.1:3211.
+services:
+  app:
+    ports:
+      - "127.0.0.1:3211:3000"
+    environment:
+      BETTER_AUTH_URL: http://localhost:3211
+      TRUSTED_ORIGINS: ""

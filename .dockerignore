@@ -1,0 +1,12 @@
+node_modules
+.next
+data
+backups
+.env
+.env.*
+!.env.example
+.dev-credentials
+*.tsbuildinfo
+next-env.d.ts
+deploy
+tests

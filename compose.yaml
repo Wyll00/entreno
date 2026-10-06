@@ -1,0 +1,22 @@
+# Base común. En el servidor se usa junto con compose.server.yaml;
+# para probar en local, con compose.local.yaml.
+name: entrenos
+
+services:
+  app:
+    build: .
+    image: entrenos:latest
+    container_name: entrenos-app
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATABASE_PATH: /data/workouts.sqlite
+      BACKUP_DIR: /backups
+    volumes:
+      - entrenos-data:/data
+      # Las copias van fuera del volumen activo, a una carpeta del host.
+      - ./backups:/backups
+
+volumes:
+  entrenos-data:
+    name: entrenos-data
